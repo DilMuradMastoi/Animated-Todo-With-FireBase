@@ -1,34 +1,51 @@
-import { signOut } from 'firebase/auth';
-import React from 'react'
-import { Link, useNavigate } from 'react-router'
-import { auth } from '../config/firebaseconfig';
+import React from "react";
+import { Link, useNavigate } from "react-router";
+import { signOut } from "firebase/auth";
+import { auth } from "../config/firebaseconfig";
+import "./Navbar.css";
 
 const Navbar = () => {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const logoutUser = () => {
+    signOut(auth)
+      .then(() => {
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-
-    const logoutUser = () => {
-      signOut(auth).then(() => {
-        navigate('/login')
-}).catch((error) => {
-
-});
-    }
   return (
-    <div style={{
-        display: 'flex' , 
-        justifyContent: 'center' , 
-        alignItems: 'center' ,
-        gap: '20px',
-        margin: '10px  0px'
-    }}>
-    <Link to={'/login'}>Login</Link>
-    <Link to={'/register'}>Register</Link>
-    <Link onClick={logoutUser}>Logout</Link>
-    <Link to={'/'}>Home</Link>
-</div>
-  )
-}
+    <nav className="navbar">
 
-export default Navbar
+      <div className="navbar-logo">
+        🚀 Todo<span>Cloud</span>
+      </div>
+
+      <div className="navbar-links">
+
+        <Link to="/" className="nav-link">
+          🏠 Home
+        </Link>
+
+        <Link to="/login" className="nav-link">
+          🔐 Login
+        </Link>
+
+        <Link to="/register" className="nav-link">
+          📝 Register
+        </Link>
+
+        <button className="logout-btn" onClick={logoutUser}>
+          🚪 Logout
+        </button>
+
+      </div>
+
+    </nav>
+  );
+};
+
+export default Navbar;

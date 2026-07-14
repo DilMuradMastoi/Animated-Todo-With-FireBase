@@ -1,54 +1,101 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import React, { useState } from 'react'
-import { auth, db } from '../config/firebaseconfig'
-import { collection, addDoc, Timestamp } from "firebase/firestore"; 
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
+import { auth, db } from "../config/firebaseconfig";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import "./Register.css";
 
 const Register = () => {
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const [fullname , setFullname] = useState('')
-    const [email , setEmail] = useState('')
-    const [password , setPassword] = useState('')
-    const [uid , setUid] = useState('')
+  const registerUser = async (event) => {
+    event.preventDefault();
 
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    const registerUser = async (event) => {
-        event.preventDefault()
+      const user = userCredential.user;
 
-        try { 
-          const userCredential = await 
-    createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+      await addDoc(collection(db, "users"), {
+        uid: user.uid,
+        fullname: fullname,
+        email: email,
+        createdAt: Timestamp.fromDate(new Date()),
+      });
 
-    const user = userCredential.user;
-   console.log( 'Auth user' , user);
+      alert("🎉 User Registered Successfully!");
 
-  const docRef = await addDoc(collection(db, "users"), {
-     uid: user.uid , 
-     fullname: fullname ,
-     email: email ,
-     createdAt:  Timestamp.fromDate(new Date())
-  });
-  console.log("Firestore Document ID: ", docRef.id);
-  alert('user registered successfully');
-} catch (error) {
-  console.error(error);
-  alert(error.message);
-}
-    };
+      setFullname("");
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
   return (
-    <>
-         <h1>Register</h1>
-        <form onSubmit={registerUser}>
-            <input type="text" placeholder='enter your fullname' value={fullname} onChange={(e) => setFullname(e.target.value)} />
-            <input type="email" placeholder='enter your email' value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder='enter your password' value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="submit">register</button>
-        </form>
-    </>
-  )
-}
+    <div className="register-page">
+      <div className="register-card">
 
-export default Register
+        <div className="logo">
+          🚀
+        </div>
+
+        <h1>Create Account</h1>
+        <p>Join us and manage your todos beautifully.</p>
+
+        <form onSubmit={registerUser}>
+
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit">
+            Create Account
+          </button>
+
+        </form>
+
+        <div className="bottom-text">
+          Already have an account?
+          <span> Login</span>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default Register;
